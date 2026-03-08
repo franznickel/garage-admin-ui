@@ -1,21 +1,19 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { forkJoin } from 'rxjs';
+import { NodeCardComponent } from '../../../components/node-card-component/node-card-component';
+import { RefreshButtonComponent } from '../../../components/refresh-button-component/refresh-button-component';
 import { NodeService } from '../../../services/node.service';
-import { MultiResponseLocalGetNodeInfoResponse, MultiResponseLocalGetNodeStatisticsResponse } from '../../../generated';
 
 @Component({
   selector: 'app-nodes-page',
-  imports: [CommonModule],
+  imports: [CommonModule, NodeCardComponent, RefreshButtonComponent],
   templateUrl: './nodes-page.html',
   styleUrl: './nodes-page.css',
 })
 export class NodesPage implements OnInit {
   private nodeService = inject(NodeService);
-  private cdr = inject(ChangeDetectorRef);
 
-  nodeInfo: MultiResponseLocalGetNodeInfoResponse | null = null;
-  nodeStatistics: MultiResponseLocalGetNodeStatisticsResponse | null = null;
+  status$ = this.nodeService.clusterStatus$;
   isLoading = false;
 
   ngOnInit(): void {
@@ -24,20 +22,9 @@ export class NodesPage implements OnInit {
 
   load(): void {
     this.isLoading = true;
-    forkJoin({
-      info: this.nodeService.getNodeInfo(),
-      statistics: this.nodeService.getNodeStatistics(),
-    }).subscribe({
-      next: ({ info, statistics }) => {
-        this.nodeInfo = info;
-        this.nodeStatistics = statistics;
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
+    this.nodeService.refresh().subscribe({
+      complete: () => this.isLoading = false,
+      error: () => this.isLoading = false,
     });
   }
 

@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { KeyService } from '../../../services/key.service';
-import {KeyCardComponent} from '../../../components/key-card-component/key-card-component';
-import {RefreshButtonComponent} from '../../../components/refresh-button-component/refresh-button-component';
+import { KeyCardComponent } from '../../../components/key-card-component/key-card-component';
+import { RefreshButtonComponent } from '../../../components/refresh-button-component/refresh-button-component';
 
 @Component({
   selector: 'app-keys-page',

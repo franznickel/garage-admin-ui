@@ -1,28 +1,28 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { NodeApiService, MultiResponseLocalGetNodeStatisticsResponse, MultiResponseLocalGetNodeInfoResponse,
+import { NodeApiService, GetClusterStatusResponse, MultiResponseLocalGetNodeInfoResponse,
   WorkerApiService, MultiResponseLocalGetWorkerInfoResponse, MultiResponseLocalListWorkersResponse,
   MultiResponseLocalCreateMetadataSnapshotResponse } from '../generated/';
+import { GarageDataService } from './garage-data.service';
 
 @Injectable({ providedIn: 'root' })
 export class NodeService {
+  private data = inject(GarageDataService);
   private nodeApi = inject(NodeApiService);
   private workerApi = inject(WorkerApiService);
 
-  getNodeInfo(): Observable<MultiResponseLocalGetNodeInfoResponse> {
-    return this.nodeApi.getNodeInfo({ node: '*' });
+  readonly clusterStatus$ = this.data.clusterStatus$;
+
+  refresh(): Observable<GetClusterStatusResponse> {
+    return this.data.refreshClusterStatus();
   }
 
-  getNodeStatistics(): Observable<MultiResponseLocalGetNodeStatisticsResponse> {
-    return this.nodeApi.getNodeStatistics({ node: '*' });
+  getNodeInfoById(id: string): Observable<MultiResponseLocalGetNodeInfoResponse> {
+    return this.data.getNodeInfo(id);
   }
 
-  getNodeInfoById(nodeId: string): Observable<MultiResponseLocalGetNodeInfoResponse> {
-    return this.nodeApi.getNodeInfo({ node: nodeId });
-  }
-
-  getNodeStatisticsById(nodeId: string): Observable<MultiResponseLocalGetNodeStatisticsResponse> {
-    return this.nodeApi.getNodeStatistics({ node: nodeId });
+  getNodeInfoById$(id: string): Observable<MultiResponseLocalGetNodeInfoResponse | null> {
+    return this.data.getNodeInfo$(id);
   }
 
   createMetadataSnapshot(nodeId = '*'): Observable<MultiResponseLocalCreateMetadataSnapshotResponse> {

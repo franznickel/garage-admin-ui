@@ -4,7 +4,7 @@ import { tap } from 'rxjs/operators';
 import { ClusterApiService, ClusterLayoutApiService, BucketApiService, AccessKeyApiService, NodeApiService,
   AdminApiTokenApiService, GetClusterStatusResponse, GetClusterHealthResponse, GetClusterStatisticsResponse,
   GetClusterLayoutResponse, ListBucketsResponse, ListKeysResponse, GetBucketInfoResponse, GetKeyInfoResponse,
-  ListAdminTokensResponse } from '../generated/';
+  ListAdminTokensResponse, MultiResponseLocalGetNodeInfoResponse } from '../generated/';
 
 @Injectable({ providedIn: 'root' })
 export class GarageDataService {
@@ -28,6 +28,9 @@ export class GarageDataService {
   // Keys
   private _keys = new BehaviorSubject<ListKeysResponse | null>(null);
   private _keyDetails = new Map<string, BehaviorSubject<GetKeyInfoResponse | null>>();
+
+  // Nodes
+  private _nodeInfos = new Map<string, BehaviorSubject<MultiResponseLocalGetNodeInfoResponse | null>>();
 
   // Admin Tokens
   private _adminTokens = new BehaviorSubject<ListAdminTokensResponse | null>(null);
@@ -131,6 +134,15 @@ export class GarageDataService {
     );
   }
 
+  refreshClusterStatus(): Observable<GetClusterStatusResponse> {
+    return this.clusterApi.getClusterStatus().pipe(
+      tap(data => {
+        this._clusterStatus.next(data);
+        this.timestamps.set('clusterStatus', Date.now());
+      })
+    );
+  }
+
   // On-Demand Detail-Loads
 
   getBucketDetail(id: string): Observable<GetBucketInfoResponse> {
@@ -163,6 +175,22 @@ export class GarageDataService {
       this._keyDetails.set(id, new BehaviorSubject<GetKeyInfoResponse | null>(null));
     }
     return this._keyDetails.get(id)!.asObservable();
+  }
+
+  getNodeInfo(id: string): Observable<MultiResponseLocalGetNodeInfoResponse> {
+    if (!this._nodeInfos.has(id)) {
+      this._nodeInfos.set(id, new BehaviorSubject<MultiResponseLocalGetNodeInfoResponse | null>(null));
+    }
+    return this.nodeApi.getNodeInfo({ node: id }).pipe(
+      tap(data => this._nodeInfos.get(id)!.next(data))
+    );
+  }
+
+  getNodeInfo$(id: string): Observable<MultiResponseLocalGetNodeInfoResponse | null> {
+    if (!this._nodeInfos.has(id)) {
+      this._nodeInfos.set(id, new BehaviorSubject<MultiResponseLocalGetNodeInfoResponse | null>(null));
+    }
+    return this._nodeInfos.get(id)!.asObservable();
   }
 
   // Cache leeren

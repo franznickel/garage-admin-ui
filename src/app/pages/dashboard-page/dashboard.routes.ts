@@ -7,6 +7,7 @@ import { KeysPage } from '../dashboard/keys-page/keys-page';
 import { KeyDetailPage } from '../dashboard/keys-page/key-detail-page/key-detail-page';
 import { AdminTokensPage } from '../dashboard/admin-tokens-page/admin-tokens-page';
 import { NodesPage } from '../dashboard/nodes-page/nodes-page';
+import { NodeDetailPage } from '../dashboard/nodes-page/node-detail-page/node-detail-page';
 
 export const dashboardRoutes: Routes = [
   {
@@ -45,6 +46,10 @@ export const dashboardRoutes: Routes = [
       {
         path: 'nodes',
         component: NodesPage
+      },
+      {
+        path: 'nodes/:id',
+        component: NodeDetailPage
       }
     ]
   }

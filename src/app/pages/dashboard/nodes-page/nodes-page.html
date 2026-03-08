@@ -1,15 +1,13 @@
 <div>
-  <button (click)="refresh()">Refresh</button>
-  @if (isLoading) {
-    <p>Laden...</p>
-  }
-  @if (nodeInfo) {
-    @for (entry of nodeInfo.success | keyvalue; track entry.key) {
-      <div>
-        <p>Node: {{ entry.key }}</p>
-        <p>Version: {{ entry.value.garageVersion }}</p>
-        <p>Features: {{ entry.value.garageFeatures?.join(', ') }}</p>
-      </div>
-    }
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold">Nodes</h1>
+    <app-refresh-button-component (buttonClicked)="refresh()" [isLoading]="isLoading"></app-refresh-button-component>
+  </div>
+  @if (status$ | async; as status) {
+    <div class="flex flex-col gap-3">
+      @for (node of status.nodes; track node.id) {
+        <app-node-card-component [node]="node"></app-node-card-component>
+      }
+    </div>
   }
 </div>

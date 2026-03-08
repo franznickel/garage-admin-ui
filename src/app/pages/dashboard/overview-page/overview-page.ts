@@ -1,10 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClusterService } from '../../../services/cluster.service';
+import {RefreshButtonComponent} from '../../../components/refresh-button-component/refresh-button-component';
 
 @Component({
   selector: 'app-overview-page',
-  imports: [CommonModule],
+  imports: [CommonModule, RefreshButtonComponent],
   templateUrl: './overview-page.html',
   styleUrl: './overview-page.css',
 })

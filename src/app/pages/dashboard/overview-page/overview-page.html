@@ -1,8 +1,8 @@
 <div>
-  <button (click)="refresh()">Refresh</button>
-  @if (isLoading) {
-    <p>Laden...</p>
-  }
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold">Overview</h1>
+    <app-refresh-button-component (buttonClicked)="refresh()" [isLoading]="isLoading"></app-refresh-button-component>
+  </div>
   @if (status$ | async; as status) {
     <p>Node ID: {{ status.nodes }}</p>
   }

@@ -1,0 +1,11 @@
+<a [routerLink]="['/dashboard/nodes', this.node.id]" class="flex items-center justify-between p-4 rounded-lg bg-gray-100 shadow-md hover:shadow-sm transition cursor-pointer">
+  <div class="flex flex-col gap-1">
+    <div class="text-sm font-semibold">
+      {{ node.hostname }}
+    </div>
+    <div class="text-xs text-gray-500">
+      Status: {{ this.node.isUp ? 'Running' : 'Down' }}
+    </div>
+  </div>
+  <i class="ph ph-arrow-right"></i>
+</a>
