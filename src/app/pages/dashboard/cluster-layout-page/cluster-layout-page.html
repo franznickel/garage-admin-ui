@@ -1,51 +1,50 @@
 <div>
   <div class="flex justify-between items-center mb-8">
     <h1 class="text-2xl font-bold">Cluster Layout</h1>
-    <app-refresh-button-component (buttonClicked)="refresh()" [isLoading]="isLoading"></app-refresh-button-component>
-  </div>
-  @if (layout$ | async; as layout) {
-    @if (layout.partitionSize == 0 || layout.roles.length == 0) {
-      @if (!setupOpen) {
-        <div class="flex flex-col items-center justify-center gap-4 py-16 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
-          <i class="ph ph-warning-circle text-4xl text-orange-400"></i>
-          <div class="text-center">
-            <p class="text-sm font-semibold text-gray-700 mb-1">No Cluster Layout available</p>
-            <p class="text-xs text-gray-400">You need to create a layout before using buckets.</p>
-          </div>
-          <button
-            (click)="openSetupDialog()"
-            class="mt-2 px-4 py-2 text-sm font-semibold text-white bg-orange-400 hover:bg-orange-500 rounded-xl transition cursor-pointer">
-            Create Layout
-          </button>
-        </div>
-      }
-      @if (setupOpen) {
-        <div class="flex flex-col gap-6">
-          <div>
-            <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Replication</h2>
-            <div class="p-4 rounded-lg bg-gray-100 shadow-md flex items-center justify-between">
-              <div class="flex flex-col gap-1">
-                <span class="text-sm font-semibold text-gray-700">Zone Redundancy</span>
-                <span class="text-xs text-gray-400">Minimum number of zones in which each partition is replicated</span>
-              </div>
-              <input
-                type="number"
-                [(ngModel)]="zoneRedundancy"
-                min="1"
-                [max]="nodeConfigs.length"
-                class="w-20 px-3 py-2 text-sm text-center border border-gray-200 rounded-xl bg-white outline-none"
-              />
+    <div class="flex items-center gap-3">
+      <button
+        (click)="openSetupDialog()"
+        class="px-4 py-2 text-sm font-semibold text-white bg-orange-400 hover:bg-orange-500 rounded-xl transition cursor-pointer">
+        Modify Cluster
+      </button>
+      <app-refresh-button-component (buttonClicked)="refresh()" [isLoading]="isLoading"></app-refresh-button-component>
+    </div>  </div>
+  @if (combined$ | async; as combined) {
+    @if (setupOpen) {
+      <div class="flex flex-col gap-6">
+        <div>
+          <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Replication</h2>
+          <div class="p-4 rounded-lg bg-gray-100 shadow-md flex items-center justify-between">
+            <div class="flex flex-col gap-1">
+              <span class="text-sm font-semibold text-gray-700">Zone Redundancy</span>
+              <span class="text-xs text-gray-400">Minimum number of zones in which each partition is replicated</span>
             </div>
+            <input
+              type="number"
+              [(ngModel)]="zoneRedundancy"
+              min="1"
+              [max]="nodeConfigs.length"
+              class="w-20 px-3 py-2 text-sm text-center border border-gray-200 rounded-xl bg-white outline-none"
+            />
           </div>
-          <div>
-            <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Nodes</h2>
-            <div class="flex flex-col gap-3">
-              @for (node of nodeConfigs; track node.id) {
-                <div class="p-4 rounded-lg bg-gray-100 shadow-md flex items-center gap-6">
-                  <div class="flex flex-col gap-0.5 w-40 shrink-0">
+        </div>
+        <div>
+          <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Nodes</h2>
+          <div class="flex flex-col gap-3">
+            @for (node of nodeConfigs; track node.id) {
+              <div class="p-4 rounded-lg bg-gray-100 shadow-md flex items-center gap-6" [class.opacity-50]="node.removeFromLayout">
+                <div class="flex flex-col gap-0.5 w-40 shrink-0">
+                  <div class="flex items-center gap-1.5">
                     <span class="text-sm font-semibold text-gray-700">{{ node.hostname }}</span>
-                    <span class="text-xs text-gray-400 font-mono truncate">{{ node.addr }}</span>
+                    @if (node.inLayout) {
+                      <span class="text-xs px-1.5 py-0.5 rounded-md bg-green-100 text-green-600 font-medium">In Layout</span>
+                    } @else {
+                      <span class="text-xs px-1.5 py-0.5 rounded-md bg-gray-200 text-gray-400 font-medium">Not in Layout</span>
+                    }
                   </div>
+                  <span class="text-xs text-gray-400 font-mono truncate">{{ node.addr }}</span>
+                </div>
+                @if (!node.removeFromLayout) {
                   <div class="flex flex-col gap-1">
                     <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Zone</label>
                     <input
@@ -65,7 +64,9 @@
                     />
                   </div>
                   <div class="flex flex-col gap-1 flex-1">
-                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Tags <span class="normal-case text-gray-300">(optional, kommagetrennt)</span></label>
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                      Tags <span class="normal-case text-gray-300">(optional, kommagetrennt)</span>
+                    </label>
                     <input
                       type="text"
                       [(ngModel)]="node.tagsRaw"
@@ -73,50 +74,72 @@
                       class="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white outline-none font-mono"
                     />
                   </div>
-                </div>
-              }
-            </div>
-          </div>
-          @if (setupError) {
-            <div class="bg-red-50 text-red-600 text-xs rounded-lg px-3.5 py-2.5 border border-red-100">
-              {{ setupError }}
-            </div>
-          }
-          <div class="flex gap-3">
-            <button
-              (click)="submitSetup(layout.version)"
-              [disabled]="isSubmitting"
-              class="px-4 py-2 text-sm font-semibold text-white bg-orange-400 hover:bg-orange-500 rounded-xl transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-              {{ isSubmitting ? 'Creating…' : 'Create Layout & apply' }}
-            </button>
-            <button
-              (click)="closeSetupDialog()"
-              [disabled]="isSubmitting"
-              class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer disabled:opacity-50">
-              Abort
-            </button>
-          </div>
-
-        </div>
-      }
-    } @else {
-      <div class="flex flex-col gap-6">
-        <div>
-          <h2 class="text-xs text-gray-400 uppercase tracking-wide mb-3">Overview</h2>
-          <div class="grid grid-cols-3 gap-4">
-            <app-info-card-component [key]="'Version'" [value]="layout.version?.toString()"></app-info-card-component>
-            <app-info-card-component [key]="'Partition Size'" [value]="(layout.partitionSize | number) + ' Bytes'"></app-info-card-component>
-          </div>
-        </div>
-        <div>
-          <h2 class="text-xs text-gray-400 uppercase tracking-wide mb-3">Roles</h2>
-          <div class="flex flex-col gap-2">
-            @for (role of layout.roles; track role.id) {
-              <app-role-card-component [role]="role"></app-role-card-component>
+                } @else {
+                  <span class="flex-1 text-xs text-gray-400 italic">
+                    {{ node.inLayout ? 'Node wird aus dem Layout entfernt' : 'Node noch nicht im Layout' }}
+                  </span>
+                }
+                <button
+                  type="button"
+                  (click)="node.removeFromLayout = !node.removeFromLayout"
+                  class="ml-auto shrink-0 px-3 py-1.5 text-xs font-semibold rounded-lg transition cursor-pointer"
+                  [class]="node.removeFromLayout ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-600 hover:bg-red-200'">
+                  {{ node.removeFromLayout ? 'Hinzufügen' : 'Entfernen' }}
+                </button>
+              </div>
             }
           </div>
         </div>
+        @if (setupError) {
+          <div class="bg-red-50 text-red-600 text-xs rounded-lg px-3.5 py-2.5 border border-red-100">
+            {{ setupError }}
+          </div>
+        }
+        <div class="flex gap-3">
+          <button
+            (click)="submitSetup(combined.layout!.version)"
+            [disabled]="isSubmitting"
+            class="px-4 py-2 text-sm font-semibold text-white bg-orange-400 hover:bg-orange-500 rounded-xl transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+            {{ isSubmitting ? 'Creating…' : 'Create Layout & apply' }}
+          </button>
+          <button
+            (click)="closeSetupDialog()"
+            [disabled]="isSubmitting"
+            class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer disabled:opacity-50">
+            Abort
+          </button>
+        </div>
       </div>
+    } @else {
+      @if (combined.layout?.partitionSize == 0 || combined.layout!.roles.length == 0) {
+        <div class="flex flex-col items-center justify-center gap-4 py-16 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
+          <i class="ph ph-warning-circle text-4xl text-orange-400"></i>
+          <div class="text-center">
+            <p class="text-sm font-semibold text-gray-700 mb-1">No Cluster Layout available</p>
+            <p class="text-xs text-gray-400">You need to create a layout before using buckets. (Use the Modify Cluster Button)</p>
+          </div>
+        </div>
+      } @else {
+        <div class="flex flex-col gap-6">
+          <div>
+            <h2 class="text-xs text-gray-400 uppercase tracking-wide mb-3">Overview</h2>
+            <div class="grid grid-cols-3 gap-4">
+              <app-info-card-component [key]="'Version'" [value]="combined.layout!.version?.toString()"></app-info-card-component>
+              <app-info-card-component [key]="'Partition Size'" [value]="(combined.layout!.partitionSize | number) + ' Bytes'"></app-info-card-component>
+            </div>
+          </div>
+          <div>
+            <h2 class="text-xs text-gray-400 uppercase tracking-wide mb-3">Roles</h2>
+            <div class="flex flex-col gap-2">
+              @for (role of combined.layout!.roles; track role.id) {
+                <app-role-card-component
+                  [role]="role"
+                  [node]="getNodeForRole(role.id, combined?.status?.nodes)"></app-role-card-component>
+              }
+            </div>
+          </div>
+        </div>
+      }
     }
   }
 </div>

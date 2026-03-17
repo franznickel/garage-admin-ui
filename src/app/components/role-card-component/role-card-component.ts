@@ -11,4 +11,5 @@ import {DecimalPipe} from '@angular/common';
 })
 export class RoleCardComponent {
   @Input() role!: any;
+  @Input() node!: any;
 }

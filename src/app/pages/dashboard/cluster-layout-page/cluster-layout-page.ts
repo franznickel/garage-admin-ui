@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { RefreshButtonComponent } from '../../../components/refresh-button-component/refresh-button-component';
 import { InfoCardComponent } from '../../../components/info-card-component/info-card-component';
 import { RoleCardComponent } from '../../../components/role-card-component/role-card-component';
-import { switchMap } from 'rxjs';
+import { combineLatest, switchMap } from 'rxjs';
 import { GarageDataService } from '../../../services/garage-data.service';
-import { ClusterLayoutApiService, UpdateClusterLayoutRequest, NodeRoleChangeRequest, ApplyClusterLayoutRequest } from '../../../generated/';
+import { NodeResp, ClusterLayoutApiService, UpdateClusterLayoutRequest, NodeRoleChangeRequest, ApplyClusterLayoutRequest } from '../../../generated/';
 import { HttpErrorResponse } from '@angular/common/http';
 
 interface NodeConfig {
@@ -16,6 +16,8 @@ interface NodeConfig {
   zone: string;
   capacityGb: number;
   tagsRaw: string;
+  inLayout: boolean;
+  removeFromLayout: boolean;
 }
 
 @Component({
@@ -29,7 +31,12 @@ export class ClusterLayoutPage implements OnInit {
   private clusterLayoutApi = inject(ClusterLayoutApiService);
   private cdr = inject(ChangeDetectorRef);
 
+  status$ = this.garageDataService.clusterStatus$;
   layout$ = this.garageDataService.clusterLayout$;
+  combined$ = combineLatest({
+    layout: this.layout$,
+    status: this.status$
+  });
 
   isLoading = false;
   setupOpen = false;
@@ -44,7 +51,7 @@ export class ClusterLayoutPage implements OnInit {
 
   load(): void {
     this.isLoading = true;
-    this.garageDataService.refreshLayout().subscribe({
+    this.garageDataService.refreshLayoutAndStatus().subscribe({
       complete: () => this.isLoading = false,
       error: () => this.isLoading = false,
     });
@@ -54,19 +61,34 @@ export class ClusterLayoutPage implements OnInit {
     this.load();
   }
 
+  getNodeForRole(roleId: string, nodes: Array<NodeResp> | undefined): any {
+    return nodes?.find(n => n.id === roleId);
+  }
+
   openSetupDialog(): void {
     this.load();
     const status = this.garageDataService.getClusterStatusSnapshot();
+    const layout = this.garageDataService.getClusterLayoutSnapshot();
+
+    const layoutNodeIds = new Set((layout?.roles ?? []).map(r => r.id));
     // @ts-ignore
     this.nodeConfigs = (status?.nodes ?? []).map(node => ({
       id: node.id,
       hostname: node.hostname,
       addr: node.addr,
-      zone: node.role?.zone ?? 'dc1',
+      zone: node.role?.zone ?? '',
       capacityGb: node.role?.capacity ? Math.floor(node.role.capacity / 1_000_000_000) : 100,
       tagsRaw: node.role?.tags?.join(', ') ?? '',
+      inLayout: layoutNodeIds.has(node.id),
+      removeFromLayout: !layoutNodeIds.has(node.id),
     }));
-    this.zoneRedundancy = 1;
+
+    const zr = layout?.parameters.zoneRedundancy;
+    if (typeof zr === 'string') {
+      this.zoneRedundancy = this.nodeConfigs.length;
+    } else {
+      this.zoneRedundancy = zr?.atLeast ?? 1;
+    }
     this.setupError = '';
     this.setupOpen = true;
   }
@@ -77,20 +99,33 @@ export class ClusterLayoutPage implements OnInit {
   }
 
   submitSetup(currentVersion: number): void {
-    if (this.nodeConfigs.some(n => !n.zone || n.capacityGb < 1)) {
-      this.setupError = 'Bitte Zone und Kapazität für alle Nodes angeben.';
+    const activeNodes = this.nodeConfigs.filter(n => !n.removeFromLayout || n.inLayout);
+
+    const hasInvalidActive = this.nodeConfigs
+      .filter(n => !n.removeFromLayout)
+      .some(n => !n.zone || n.capacityGb < 1);
+
+    if (hasInvalidActive) {
+      this.setupError = 'Bitte Zone und Kapazität für alle aktiven Nodes angeben.';
       return;
     }
 
     this.isSubmitting = true;
     this.setupError = '';
 
-    const roles: NodeRoleChangeRequest[] = this.nodeConfigs.map(n => ({
-      id: n.id,
-      zone: n.zone,
-      capacity: n.capacityGb * 1_000_000_000,
-      tags: n.tagsRaw ? n.tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [],
-    }));
+    const roles: NodeRoleChangeRequest[] = this.nodeConfigs
+      .filter(n => n.inLayout || !n.removeFromLayout) // only send relevant nodes
+      .map(n => {
+        if (n.removeFromLayout && n.inLayout) {
+          return { id: n.id, remove: true };
+        }
+        return {
+          id: n.id,
+          zone: n.zone,
+          capacity: n.capacityGb * 1_000_000_000,
+          tags: n.tagsRaw ? n.tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [],
+        };
+      });
 
     const updateClusterLayoutRequest: UpdateClusterLayoutRequest = {
       roles: roles,

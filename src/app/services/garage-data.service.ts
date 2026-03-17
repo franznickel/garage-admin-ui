@@ -67,6 +67,22 @@ export class GarageDataService {
     );
   }
 
+  refreshLayoutAndStatus(): Observable<{
+    status: GetClusterStatusResponse;
+    layout: GetClusterLayoutResponse;
+  }> {
+    return forkJoin({
+      status: this.clusterApi.getClusterStatus().pipe(
+        tap(data => this._clusterStatus.next(data))
+      ),
+      layout: this.clusterLayoutApi.getClusterLayout().pipe(
+        tap(data => this._clusterLayout.next(data))
+      ),
+    }).pipe(
+      tap(() => this.timestamps.set('cluster', Date.now()))
+    );
+  }
+
   refreshLayout(): Observable<GetClusterLayoutResponse> {
     return this.clusterLayoutApi.getClusterLayout().pipe(
       tap(data => {
@@ -164,6 +180,10 @@ export class GarageDataService {
 
   getClusterStatusSnapshot() {
     return this._clusterStatus.getValue();
+  }
+
+  getClusterLayoutSnapshot() {
+    return this._clusterLayout.getValue();
   }
 
   // Cache leeren
