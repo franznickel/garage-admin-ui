@@ -17,21 +17,21 @@
     <div class="flex items-center justify-between text-xs text-gray-500">
       <div class="flex items-center gap-1">
         <i class="ph ph-database"></i>
-        <span>Kapazität -- {{ (role.usableCapacity / role.capacity * 100) | number:'1.0-0' }}% nutzbar</span>
+        <span>Capacity -- {{ (role.capacity / role.usableCapacity * 100) - 100 | number:'1.0-0' }}% used</span>
       </div>
       <span>{{ (role.capacity / 1000000000) | number:'1.0-0' }}GB gesamt</span>
     </div>
     <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
       <div class="h-full rounded-full bg-orange-400"
-           [style.width.%]="(role.usableCapacity / role.capacity) * 100">
+           [style.width.%]="((role.capacity / role.usableCapacity) * 100) - 100">
       </div>
     </div>
     <div class="flex items-center justify-between text-xs text-gray-500">
       <div class="flex items-center gap-1">
         <i class="ph ph-layout"></i>
-        <span>{{ role.storedPartitions }} gespeicherte Partitionen</span>
+        <span>{{ role.storedPartitions }} stored partitions</span>
       </div>
-      <span>{{ (role.usableCapacity / 1000000000) | number:'1.0-0' }}GB nutzbar</span>
+      <span>{{ (role.usableCapacity / 1000000000) | number:'1.0-0' }}GB usable</span>
     </div>
   </div>
 </div>

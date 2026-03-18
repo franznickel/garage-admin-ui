@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { KeyInfoBucketResponse, ListBucketsResponseItem } from '../../generated/';
 
 @Component({
   selector: 'app-bucket-card-component',

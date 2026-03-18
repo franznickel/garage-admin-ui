@@ -61,7 +61,7 @@ export class ClusterLayoutPage implements OnInit {
     this.load();
   }
 
-  getNodeForRole(roleId: string, nodes: Array<NodeResp> | undefined): any {
+  getNodeForRole(roleId: string, nodes: NodeResp[] | undefined) {
     return nodes?.find(n => n.id === roleId);
   }
 
@@ -71,7 +71,7 @@ export class ClusterLayoutPage implements OnInit {
     const layout = this.garageDataService.getClusterLayoutSnapshot();
 
     const layoutNodeIds = new Set((layout?.roles ?? []).map(r => r.id));
-    // @ts-ignore
+    // @ts-expect-error Weil das Format so stimmt.
     this.nodeConfigs = (status?.nodes ?? []).map(node => ({
       id: node.id,
       hostname: node.hostname,
@@ -99,14 +99,12 @@ export class ClusterLayoutPage implements OnInit {
   }
 
   submitSetup(currentVersion: number): void {
-    const activeNodes = this.nodeConfigs.filter(n => !n.removeFromLayout || n.inLayout);
-
     const hasInvalidActive = this.nodeConfigs
       .filter(n => !n.removeFromLayout)
       .some(n => !n.zone || n.capacityGb < 1);
 
     if (hasInvalidActive) {
-      this.setupError = 'Bitte Zone und Kapazität für alle aktiven Nodes angeben.';
+      this.setupError = 'Set capacity and and zone for every active Node please.';
       return;
     }
 
@@ -149,11 +147,11 @@ export class ClusterLayoutPage implements OnInit {
       },
       error: (e: HttpErrorResponse) => {
         if (e.status === 400) {
-          this.setupError = 'Ungültige Konfiguration. Eingaben prüfen.';
+          this.setupError = 'Invalid Configuration. Please check input.';
         } else if (e.status === 409) {
-          this.setupError = 'Versionskonfikt. Bitte die Seite neu laden.';
+          this.setupError = 'Version conflict. Please reload Page.';
         } else {
-          this.setupError = 'Fehler beim Erstellen des Layouts.';
+          this.setupError = 'Error while creating Layout.';
         }
         this.isSubmitting = false;
         this.cdr.detectChanges();

@@ -7,6 +7,6 @@ import {Component, Input} from '@angular/core';
   styleUrl: './info-card-component.css',
 })
 export class InfoCardComponent {
-  @Input() value!: any;
+  @Input() value!: string | number | null | undefined;
   @Input() key!: string;
 }

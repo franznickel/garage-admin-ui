@@ -1,4 +1,5 @@
-import {Component, Input} from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { GetAdminTokenInfoResponse } from '../../generated/';
 
 @Component({
   selector: 'app-token-card-component',
@@ -7,5 +8,5 @@ import {Component, Input} from '@angular/core';
   styleUrl: './token-card-component.css',
 })
 export class TokenCardComponent {
-    @Input() token!: any;
+    @Input() token!: any ;
 }

@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
-import {DecimalPipe} from '@angular/common';
+import { Component, Input } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { NodeResp, LayoutNodeRole } from '../../generated/';
 
 @Component({
   selector: 'app-role-card-component',

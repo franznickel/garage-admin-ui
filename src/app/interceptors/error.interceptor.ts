@@ -14,10 +14,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         authService.logout();
         router.navigate(['/login']);
       } else if (error.status === 0) {
-        // Netzwerkfehler – API nicht erreichbar
-        console.error('API nicht erreichbar:', error.message);
+        console.error('API not reachable:', error.message);
       } else if (error.status >= 500) {
-        console.error('Server-Fehler:', error.status, error.message);
+        console.error('Server-Error:', error.status, error.message);
       }
 
       return throwError(() => error);

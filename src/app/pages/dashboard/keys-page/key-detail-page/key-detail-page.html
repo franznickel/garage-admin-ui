@@ -14,7 +14,7 @@
       </div>
       <div class="grid grid-cols-3 gap-4">
         <app-info-card-component [key]="'Created'" [value]="key.created | date:'medium'"></app-info-card-component>
-        <app-info-card-component [key]="'Expiration'" [value]="key.expiration == null ? 'never' : key.expiration | date:'medium'"></app-info-card-component>
+        <app-info-card-component [key]="'Expiration'" [value]="key.expiration === null ? 'never' : key.expiration | date:'medium'"></app-info-card-component>
         <app-info-card-component [key]="'Expired'" [value]="key.expired ? 'Yes' : 'No'"></app-info-card-component>
         <app-info-card-component [key]="'can create Bucket'" [value]="key.permissions.createBucket ? 'Yes' : 'No'"></app-info-card-component>
       </div>

@@ -46,8 +46,9 @@
                 </div>
                 @if (!node.removeFromLayout) {
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Zone</label>
+                    <label for="zone" class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Zone</label>
                     <input
+                      id="zone"
                       type="text"
                       [(ngModel)]="node.zone"
                       placeholder="dc1"
@@ -55,8 +56,9 @@
                     />
                   </div>
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Capacity (GB)</label>
+                    <label for="capacity" class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Capacity (GB)</label>
                     <input
+                      id="capacity"
                       type="number"
                       [(ngModel)]="node.capacityGb"
                       min="1"
@@ -64,10 +66,11 @@
                     />
                   </div>
                   <div class="flex flex-col gap-1 flex-1">
-                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                    <label for="tags" class="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                       Tags <span class="normal-case text-gray-300">(optional, kommagetrennt)</span>
                     </label>
                     <input
+                      id="tags"
                       type="text"
                       [(ngModel)]="node.tagsRaw"
                       placeholder="tag1, tag2"
@@ -111,7 +114,7 @@
         </div>
       </div>
     } @else {
-      @if (combined.layout?.partitionSize == 0 || combined.layout!.roles.length == 0) {
+      @if (combined.layout?.partitionSize == 0 || combined.layout?.roles?.length == 0) {
         <div class="flex flex-col items-center justify-center gap-4 py-16 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
           <i class="ph ph-warning-circle text-4xl text-orange-400"></i>
           <div class="text-center">
@@ -124,17 +127,17 @@
           <div>
             <h2 class="text-xs text-gray-400 uppercase tracking-wide mb-3">Overview</h2>
             <div class="grid grid-cols-3 gap-4">
-              <app-info-card-component [key]="'Version'" [value]="combined.layout!.version?.toString()"></app-info-card-component>
-              <app-info-card-component [key]="'Partition Size'" [value]="(combined.layout!.partitionSize | number) + ' Bytes'"></app-info-card-component>
+              <app-info-card-component [key]="'Version'" [value]="combined.layout?.version?.toString()"></app-info-card-component>
+              <app-info-card-component [key]="'Partition Size'" [value]="(combined.layout?.partitionSize | number) + ' Bytes'"></app-info-card-component>
             </div>
           </div>
           <div>
             <h2 class="text-xs text-gray-400 uppercase tracking-wide mb-3">Roles</h2>
             <div class="flex flex-col gap-2">
-              @for (role of combined.layout!.roles; track role.id) {
+              @for (role of combined.layout?.roles; track role.id) {
                 <app-role-card-component
                   [role]="role"
-                  [node]="getNodeForRole(role.id, combined?.status?.nodes)"></app-role-card-component>
+                  [node]="getNodeForRole(role.id, combined.status?.nodes)"></app-role-card-component>
               }
             </div>
           </div>

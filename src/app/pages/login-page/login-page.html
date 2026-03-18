@@ -3,8 +3,8 @@
     <app-logo-component class="flex items-center gap-2.5 justify-center mb-8"></app-logo-component>
 
     <div class="bg-white rounded-2xl border border-gray-200 p-8" style="box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.05);">
-      <h1 class="text-xl font-semibold text-gray-900 mb-1">Verbinden</h1>
-      <p class="text-sm text-gray-400 mb-6">Garage-Instanz und Admin-Token eingeben.</p>
+      <h1 class="text-xl font-semibold text-gray-900 mb-1">Connect</h1>
+      <p class="text-sm text-gray-400 mb-6">Insert Garage URL and Admin Token.</p>
       @if (errorMessage) {
         <div class="bg-red-50 text-red-600 text-xs rounded-lg px-3.5 py-2.5 mb-5 border border-red-100">
           {{ errorMessage }}
@@ -37,7 +37,7 @@
           [disabled]="isLoading"
           class="w-full py-2.5 text-sm bg-[#e8832a] font-semibold text-white rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {{ isLoading ? 'Wird verbunden…' : 'Verbinden' }}
+          {{ isLoading ? 'Connecting…' : 'Connect' }}
         </button>
       </form>
     </div>
