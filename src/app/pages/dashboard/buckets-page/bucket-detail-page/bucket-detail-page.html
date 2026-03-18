@@ -9,21 +9,108 @@
   </div>
   @if (bucket$ | async; as bucket) {
     <div class="flex flex-col gap-6">
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm text-gray-500">Bucket ID: {{ bucket.id }}</h2>
+      <div>
+        <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Bucket ID</h2>
+        <p class="text-xs text-gray-400 font-mono mb-4">{{ bucket.id }}</p>
+        <div class="grid grid-cols-3 gap-4">
+          <app-info-card-component [key]="'Created'" [value]="bucket.created | date:'medium'"></app-info-card-component>
+          <app-info-card-component [key]="'Website Access'" [value]="bucket.websiteAccess ? 'Enabled' : 'Disabled'"></app-info-card-component>
+          <app-info-card-component [key]="'Objects'" [value]="bucket.objects"></app-info-card-component>
+          <app-info-card-component [key]="'Storage Used'" [value]="formatBytes(bucket.bytes)"></app-info-card-component>
+          <app-info-card-component [key]="'Unfinished Uploads'" [value]="bucket.unfinishedUploads"></app-info-card-component>
+        </div>
       </div>
-      <div class="grid grid-cols-3 gap-4">
-        <app-info-card-component [key]="'Created'" [value]="bucket.created | date:'medium'"></app-info-card-component>
-        <app-info-card-component [key]="'Website Access'" [value]="bucket.websiteAccess ? 'Enabled' : 'Disabled'"></app-info-card-component>
-        <app-info-card-component [key]="'Objects'" [value]="bucket.objects"></app-info-card-component>
-        <app-info-card-component [key]="'Storage Used'" [value]="formatBytes(bucket.bytes)"></app-info-card-component>
-        <app-info-card-component [key]="'Unfinished Uploads'" [value]="bucket.unfinishedUploads"></app-info-card-component>
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Quotas</h2>
+          <button (click)="openQuota(bucket)" class="text-xs text-orange-400 hover:text-orange-500 font-semibold transition cursor-pointer">
+            Edit Quotas
+          </button>
+        </div>
+        @if (quotaOpen) {
+          <div class="p-6 rounded-2xl border border-gray-200 bg-white flex flex-col gap-4 mb-3">
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1">
+                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Max. Objects</label>
+                <input type="number" [(ngModel)]="quotaMaxObjects" placeholder="Unlimited"
+                       class="px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 outline-none focus:bg-white transition" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Max. Size (Bytes)</label>
+                <input type="number" [(ngModel)]="quotaMaxBytes" placeholder="Unlimited"
+                       class="px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 outline-none focus:bg-white transition" />
+              </div>
+            </div>
+            @if (quotaError) {
+              <div class="bg-red-50 text-red-600 text-xs rounded-lg px-3.5 py-2.5 border border-red-100">{{ quotaError }}</div>
+            }
+            <div class="flex gap-3">
+              <button (click)="submitQuota()" [disabled]="isSavingQuota"
+                      class="px-4 py-2 text-sm font-semibold text-white bg-orange-400 hover:bg-orange-500 rounded-xl transition cursor-pointer disabled:opacity-50">
+                {{ isSavingQuota ? 'Saving…' : 'Save' }}
+              </button>
+              <button (click)="closeQuota()" [disabled]="isSavingQuota"
+                      class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer disabled:opacity-50">
+                Abort
+              </button>
+            </div>
+          </div>
+        }
+        <div class="grid grid-cols-2 gap-4">
+          <app-info-card-component [key]="'Max. Objects'" [value]="bucket.quotas?.maxObjects ?? 'Unlimited'"></app-info-card-component>
+          <app-info-card-component [key]="'Max. Size'" [value]="bucket.quotas?.maxSize ? formatBytes(bucket.quotas.maxSize!) : 'Unlimited'"></app-info-card-component>
+        </div>
       </div>
-      <div class="shadow-sm rounded-lg p-4 bg-gray-100">
-        <div class="text-sm text-gray-500">Access Keys</div>
-        <div class="p-4 flex items-center justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Access Keys</h2>
+          <button (click)="openPerm()" class="text-xs text-orange-400 hover:text-orange-500 font-semibold transition cursor-pointer">
+            Add Keys
+          </button>
+        </div>
+        @if (permOpen) {
+          <div class="p-6 rounded-2xl border border-gray-200 bg-white flex flex-col gap-4 mb-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Select Key</label>
+              <select [(ngModel)]="selectedKeyId" (ngModelChange)="onKeySelected($event, bucket)"
+                      class="px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 outline-none focus:bg-white transition">
+                <option value="">— Select Key —</option>
+                @if (keys$ | async; as keys) {
+                  @for (key of keys; track key.id) {
+                    <option [value]="key.id">{{ key.name }} ({{ key.id }})</option>
+                  }
+                }
+              </select>
+            </div>
+            <div class="flex items-center gap-6">
+              <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="permRead" class="w-4 h-4 accent-orange-400" /> Read
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="permWrite" class="w-4 h-4 accent-orange-400" /> Write
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="permOwner" class="w-4 h-4 accent-orange-400" /> Owner
+              </label>
+            </div>
+            @if (permError) {
+              <div class="bg-red-50 text-red-600 text-xs rounded-lg px-3.5 py-2.5 border border-red-100">{{ permError }}</div>
+            }
+            <div class="flex gap-3">
+              <button (click)="submitPerm()" [disabled]="isSavingPerm"
+                      class="px-4 py-2 text-sm font-semibold text-white bg-orange-400 hover:bg-orange-500 rounded-xl transition cursor-pointer disabled:opacity-50">
+                {{ isSavingPerm ? 'Saving…' : 'Save' }}
+              </button>
+              <button (click)="closePerm()" [disabled]="isSavingPerm"
+                      class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer disabled:opacity-50">
+                Abort
+              </button>
+            </div>
+          </div>
+        }
+        <div class="flex flex-col gap-2">
           @for (key of bucket.keys; track key.accessKeyId) {
-            <app-key-card-component [key]="key" class="w-full"></app-key-card-component>
+            <app-key-card-component [key]="key" (deleteButtonClicked)="denyPerm(key.accessKeyId)" [deleteButton]="true" class="w-full"></app-key-card-component>
           }
         </div>
       </div>

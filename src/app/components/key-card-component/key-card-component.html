@@ -1,41 +1,51 @@
-<a [routerLink]="['/dashboard/keys', this.key.id ?? this.key.accessKeyId]" class="flex items-center justify-between p-4 rounded-lg bg-gray-100 shadow-md hover:shadow-sm transition cursor-pointer">
-  <div class="flex flex-col gap-1">
-    <div class="text-sm font-semibold">
-      {{ key.name }}
-    </div>
-    <div class="text-xs text-gray-500">
-      {{ this.key.id ?? this.key.accessKeyId }}
-    </div>
-  </div>
-  @if (key.permissions ?? false) {
-    <div>
-      <div class="flex gap-2 text-xs">
-        @if (key.permissions.read) {
-          <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded">read</span>
-        }
-        @if (key.permissions.write) {
-          <span class="px-2 py-0.5 bg-green-100 text-blue-700 rounded">write</span>
-        }
-        @if (key.permissions.owner) {
-          <span class="px-2 py-0.5 bg-green-100 text-purple-700 rounded">owner</span>
-        }
+<div class="grid grid-cols-[auto_3rem] justify-stretch p-4 rounded-lg bg-gray-100 shadow-md hover:shadow-sm transition cursor-pointer">
+  <a [routerLink]="['/dashboard/keys', key.id ?? key.accessKeyId]" class="flex items-center justify-between px-4">
+    <div class="flex flex-col gap-1">
+      <div class="text-sm font-semibold">
+        {{ key.name }}
+      </div>
+      <div class="text-xs text-gray-500">
+        {{ key.id ?? key.accessKeyId }}
       </div>
     </div>
-  }
-  @else {
-    <div>
-      <div class="flex flex-col text-xs">
-        @if (key.created != null) {
-          <span>Created: {{ key.created }}</span>
-        }
-        @if (key.expiration != null) {
-          <span>Expiration: {{ key.expiration }}</span>
-        }
-        @if (key.expired != null) {
-          <span>Expired: {{ key.expired ? 'Yes' : 'No' }}</span>
-        }
+    @if (key.permissions ?? false) {
+      <div>
+        <div class="flex gap-2 text-xs">
+          @if (key.permissions.read) {
+            <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded">read</span>
+          }
+          @if (key.permissions.write) {
+            <span class="px-2 py-0.5 bg-green-100 text-blue-700 rounded">write</span>
+          }
+          @if (key.permissions.owner) {
+            <span class="px-2 py-0.5 bg-green-100 text-purple-700 rounded">owner</span>
+          }
+        </div>
       </div>
+    }
+    @else {
+      <div>
+        <div class="flex flex-col text-xs">
+          @if (key.created != null) {
+            <span>Created: {{ key.created }}</span>
+          }
+          @if (key.expiration != null) {
+            <span>Expiration: {{ key.expiration }}</span>
+          }
+          @if (key.expired != null) {
+            <span>Expired: {{ key.expired ? 'Yes' : 'No' }}</span>
+          }
+        </div>
+      </div>
+    }
+    <i class="ph ph-arrow-right"></i>
+  </a>
+  @if (deleteButton) {
+    <div class="flex items-center justify-center">
+      <button (click)="delete()"
+        class="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-red-500 shadow-md hover:shadow-sm rounded-lg transition cursor-pointer">
+        <i class="ph ph-trash"></i>
+      </button>
     </div>
   }
-  <i class="ph ph-arrow-right"></i>
-</a>
+</div>

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ListKeysResponseItem } from '../../generated/';
 
@@ -10,4 +10,10 @@ import { ListKeysResponseItem } from '../../generated/';
 })
 export class KeyCardComponent {
   @Input() key!: any;
+  @Input() deleteButton: boolean = false;
+  @Output() deleteButtonClicked = new EventEmitter<void>();
+
+  delete() {
+    this.deleteButtonClicked.emit();
+  }
 }
