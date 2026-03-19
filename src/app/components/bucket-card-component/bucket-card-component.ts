@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { KeyInfoBucketResponse, ListBucketsResponseItem } from '../../generated/';
@@ -13,7 +13,7 @@ import { KeyInfoBucketResponse, ListBucketsResponseItem } from '../../generated/
   styleUrl: './bucket-card-component.css',
 })
 export class BucketCardComponent {
-  @Input() bucket!: any;
+  @Input() bucket!: KeyInfoBucketResponse | ListBucketsResponseItem;
   @Input() deleteButton: boolean = false;
   @Output() deleteButtonClicked = new EventEmitter<void>();
 

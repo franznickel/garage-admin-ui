@@ -2,10 +2,10 @@
   <div class="flex flex-col gap-1 shrink-0">
     <div class="flex items-center gap-2">
       <span class="rounded-full h-4 w-4 bg-orange-400"></span>
-      <span class="text-sm font-semibold">{{ node.hostname }}</span>
-      <span class="px-2 py-0.5 rounded-full bg-gray-200 text-sm font-semibold">{{ role.zone ?? '—' }}</span>
+      <span class="text-sm font-semibold">{{ node != undefined ? node.hostname : '--'}}</span>
+      <span class="px-2 py-0.5 rounded-full bg-gray-200 text-sm font-semibold">{{ role.zone }}</span>
     </div>
-    @if (role.tags?.length) {
+    @if (role.tags.length) {
       <div class="flex flex-wrap gap-1 mt-1">
         @for (tag of role.tags; track tag) {
           <span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-500 font-mono">{{ tag }}</span>
@@ -14,24 +14,26 @@
     }
   </div>
   <div class="flex flex-col gap-2 flex-1 min-w-0 px-8">
-    <div class="flex items-center justify-between text-xs text-gray-500">
-      <div class="flex items-center gap-1">
-        <i class="ph ph-database"></i>
-        <span>Capacity -- {{ (role.capacity / role.usableCapacity * 100) - 100 | number:'1.0-0' }}% used</span>
+    @if (role.capacity != undefined && role.usableCapacity != undefined) {
+      <div class="flex items-center justify-between text-xs text-gray-500">
+        <div class="flex items-center gap-1">
+          <i class="ph ph-database"></i>
+          <span>Capacity -- {{ (role.capacity / role.usableCapacity * 100) - 100 | number:'1.0-0' }}% used</span>
+        </div>
+        <span>{{ (role.capacity / 1000000000) | number:'1.0-0' }}GB gesamt</span>
       </div>
-      <span>{{ (role.capacity / 1000000000) | number:'1.0-0' }}GB gesamt</span>
-    </div>
-    <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-      <div class="h-full rounded-full bg-orange-400"
-           [style.width.%]="((role.capacity / role.usableCapacity) * 100) - 100">
+      <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+        <div class="h-full rounded-full bg-orange-400"
+             [style.width.%]="((role.capacity / role.usableCapacity) * 100) - 100">
+        </div>
       </div>
-    </div>
-    <div class="flex items-center justify-between text-xs text-gray-500">
-      <div class="flex items-center gap-1">
-        <i class="ph ph-layout"></i>
-        <span>{{ role.storedPartitions }} stored partitions</span>
+      <div class="flex items-center justify-between text-xs text-gray-500">
+        <div class="flex items-center gap-1">
+          <i class="ph ph-layout"></i>
+          <span>{{ role.storedPartitions }} stored partitions</span>
+        </div>
+        <span>{{ (role.usableCapacity / 1000000000) | number:'1.0-0' }}GB usable</span>
       </div>
-      <span>{{ (role.usableCapacity / 1000000000) | number:'1.0-0' }}GB usable</span>
-    </div>
+    }
   </div>
 </div>

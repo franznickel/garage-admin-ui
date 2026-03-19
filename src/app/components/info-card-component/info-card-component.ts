@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-info-card-component',
@@ -7,6 +7,6 @@ import {Component, Input} from '@angular/core';
   styleUrl: './info-card-component.css',
 })
 export class InfoCardComponent {
-  @Input() value!: string | number | null | undefined;
+  @Input() value!: string | number;
   @Input() key!: string;
 }

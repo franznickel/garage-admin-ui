@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-refresh-button-component',
@@ -7,9 +7,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
   styleUrl: './refresh-button-component.css',
 })
 export class RefreshButtonComponent {
-  @Output()
-  buttonClicked = new EventEmitter<void>();
   @Input() isLoading!: boolean;
+  @Output() buttonClicked = new EventEmitter<void>();
 
   onClick() {
     this.buttonClicked.emit();

@@ -13,5 +13,5 @@ import { NodeResp } from '../../generated/';
   styleUrl: './node-card-component.css',
 })
 export class NodeCardComponent {
-  @Input() node!: any;
+  @Input() node!: NodeResp;
 }

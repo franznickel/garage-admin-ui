@@ -8,5 +8,5 @@ import { GetAdminTokenInfoResponse } from '../../generated/';
   styleUrl: './token-card-component.css',
 })
 export class TokenCardComponent {
-    @Input() token!: any ;
+    @Input() token!: GetAdminTokenInfoResponse ;
 }

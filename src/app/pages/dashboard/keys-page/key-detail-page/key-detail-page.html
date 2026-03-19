@@ -40,8 +40,8 @@
         <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Key ID</h2>
         <p class="text-xs text-gray-400 font-mono mb-4">{{ key.accessKeyId }}</p>
         <div class="grid grid-cols-3 gap-4">
-          <app-info-card-component [key]="'Created'" [value]="key.created | date:'medium'"></app-info-card-component>
-          <app-info-card-component [key]="'Expiration'" [value]="key.expiration === null ? 'never' : key.expiration | date:'medium'"></app-info-card-component>
+          <app-info-card-component [key]="'Created'" [value]="(key.created | date:'medium') ?? '-'"></app-info-card-component>
+          <app-info-card-component [key]="'Expiration'" [value]="(key.expiration | date:'medium') ?? '-'"></app-info-card-component>
           <app-info-card-component [key]="'Expired'" [value]="key.expired ? 'Yes' : 'No'"></app-info-card-component>
           <app-info-card-component [key]="'can create Bucket'" [value]="key.permissions.createBucket ? 'Yes' : 'No'"></app-info-card-component>
         </div>
@@ -79,7 +79,7 @@
                 <option value="">— Select Bucket —</option>
                 @if (buckets$ | async; as buckets) {
                   @for (bucket of buckets; track bucket.id) {
-                    <option [value]="bucket.id">{{ bucket.globalAliases?.[0] ?? bucket.id }}</option>
+                    <option [value]="bucket.id">{{ bucket.globalAliases }}</option>
                   }
                 }
               </select>

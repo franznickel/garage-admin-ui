@@ -1,6 +1,6 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ListKeysResponseItem } from '../../generated/';
+import { ListKeysResponseItem, GetBucketInfoKey } from '../../generated/';
 
 @Component({
   selector: 'app-key-card-component',
@@ -9,7 +9,7 @@ import { ListKeysResponseItem } from '../../generated/';
   styleUrl: './key-card-component.css',
 })
 export class KeyCardComponent {
-  @Input() key!: any;
+  @Input() key!: ListKeysResponseItem | GetBucketInfoKey;
   @Input() deleteButton: boolean = false;
   @Output() deleteButtonClicked = new EventEmitter<void>();
 

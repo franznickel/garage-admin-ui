@@ -127,7 +127,7 @@
           <div>
             <h2 class="text-xs text-gray-400 uppercase tracking-wide mb-3">Overview</h2>
             <div class="grid grid-cols-3 gap-4">
-              <app-info-card-component [key]="'Version'" [value]="combined.layout?.version?.toString()"></app-info-card-component>
+              <app-info-card-component [key]="'Version'" [value]="combined.layout?.version?.toString() ?? '-'"></app-info-card-component>
               <app-info-card-component [key]="'Partition Size'" [value]="(combined.layout?.partitionSize | number) + ' Bytes'"></app-info-card-component>
             </div>
           </div>

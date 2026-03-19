@@ -4,18 +4,26 @@
       <div class="text-sm font-semibold">
         {{ bucket.globalAliases }}
       </div>
-      @if (bucket.created ?? false) {
+      @if ('created' in bucket) {
         <div class="text-xs text-gray-500">
           Created {{ bucket.created | date:'medium' }}
         </div>
       }
-      @for (localAlias of bucket.localAliases; track localAlias.accessKeyId) {
-        <div class="text-xs text-gray-500">
-          {{ localAlias.alias }}
-        </div>
+      @if ('created' in bucket) {
+        @for (localAlias of bucket.localAliases; track localAlias.accessKeyId) {
+          <div class="text-xs text-gray-500">
+            {{ localAlias.alias }}
+          </div>
+        }
+      } @else {
+        @for (localAlias of bucket.localAliases; track localAlias) {
+          <div class="text-xs text-gray-500">
+            {{ localAlias }}
+          </div>
+        }
       }
     </div>
-    @if (bucket.permissions ?? false) {
+    @if ('permissions' in bucket) {
       <div>
         <div class="flex gap-2 text-xs">
           @if (bucket.permissions.read) {

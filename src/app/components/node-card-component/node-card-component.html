@@ -7,33 +7,33 @@
     <span class="text-xs text-gray-400 font-mono truncate">{{ node.addr }}</span>
   </div>
   <div class="flex flex-col gap-2 flex-1 min-w-0 px-8">
-    @if (node.dataPartition != null) {
+    @if (node.dataPartition != undefined) {
       <div class="flex items-center justify-between text-xs text-gray-500">
         <div class="flex items-center gap-1">
           <i class="ph ph-map-pin"></i>
-          <span>Data -- {{ (node.dataPartition?.total / node.dataPartition?.available * 100) - 100 | number:'1.0-0' }}% used</span>
+          <span>Data -- {{ (node.dataPartition.total / node.dataPartition.available * 100) - 100 | number:'1.0-0' }}% used</span>
         </div>
-        <span>{{ (node.dataPartition?.available / 1000000000) | number:'1.0-0' }}Gb free</span>
+        <span>{{ (node.dataPartition.available / 1000000000) | number:'1.0-0' }}Gb free</span>
       </div>
       <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
         <div class="h-full rounded-full"
-             [class]="(node.dataPartition?.available / node.dataPartition?.total) > 0.2 ? 'bg-orange-400' : 'bg-red-500'"
-             [style.width.%]="((node.dataPartition?.total / node.dataPartition?.available) * 100) - 100">
+             [class]="(node.dataPartition.available / node.dataPartition.total) > 0.2 ? 'bg-orange-400' : 'bg-red-500'"
+             [style.width.%]="((node.dataPartition.total / node.dataPartition.available) * 100) - 100">
         </div>
       </div>
     }
-    @if (node.metadataPartition != null) {
+    @if (node.metadataPartition != undefined) {
       <div class="flex items-center justify-between text-xs text-gray-500">
         <div class="flex items-center gap-1">
           <i class="ph ph-map-pin"></i>
-          <span>Metadata -- {{ (node.metadataPartition?.total / node.metadataPartition?.available * 100) - 100 | number:'1.0-0' }}% used</span>
+          <span>Metadata -- {{ (node.metadataPartition.total / node.metadataPartition.available * 100) - 100 | number:'1.0-0' }}% used</span>
         </div>
-        <span>{{ (node.metadataPartition?.available / 1000000000) | number:'1.0-0' }}Gb free</span>
+        <span>{{ (node.metadataPartition.available / 1000000000) | number:'1.0-0' }}Gb free</span>
       </div>
       <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
         <div class="h-full rounded-full"
-             [class]="(node.metadataPartition?.available / node.metadataPartition?.total) > 0.2 ? 'bg-orange-400' : 'bg-red-500'"
-             [style.width.%]="((node.metadataPartition?.total / node.metadataPartition?.available) * 100) - 100">
+             [class]="(node.metadataPartition.available / node.metadataPartition.total) > 0.2 ? 'bg-orange-400' : 'bg-red-500'"
+             [style.width.%]="((node.metadataPartition.total / node.metadataPartition.available) * 100) - 100">
         </div>
       </div>
     }

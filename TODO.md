@@ -1,9 +1,4 @@
 ### Funktionalität
-- Bucket erstellen / löschen
-- Bucket Einstellungen bearbeiten (Quotas, Website-Konfiguration)
-- Bucket Aliases hinzufügen / entfernen
-- Key erstellen / löschen
-- Key Berechtigungen bearbeiten (AllowBucketKey / DenyBucketKey)
 - Admin Token erstellen / löschen
 - Staged Cluster Layout Changes anwenden / verwerfen statt immer sofort anzuwenden
 - Route Guard für nicht eingeloggte Nutzer

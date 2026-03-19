@@ -11,6 +11,6 @@ import { NodeResp, LayoutNodeRole } from '../../generated/';
   styleUrl: './role-card-component.css',
 })
 export class RoleCardComponent {
-  @Input() role!: any;
-  @Input() node!: any;
+  @Input() role!: LayoutNodeRole;
+  @Input() node!: NodeResp | undefined;
 }
