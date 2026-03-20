@@ -1,13 +1,120 @@
 <div>
   <div class="flex justify-between items-center mb-8">
     <h1 class="text-2xl font-bold">Token</h1>
-    <app-refresh-button-component (buttonClicked)="refresh()" [isLoading]="isLoading"></app-refresh-button-component>
-  </div>
-  @if (adminTokens$ | async; as tokens) {
-    <div class="flex flex-col gap-3">
-      @for (token of tokens; track token.id) {
-        <app-token-card-component [token]="token"></app-token-card-component>
-      }
+    <div class="flex items-center gap-3">
+      <button
+        (click)="toggleCreatePanel()"
+        class="px-4 py-2 text-sm font-semibold text-white bg-orange-400 hover:bg-orange-500 rounded-xl transition cursor-pointer">
+        Create Token
+      </button>
+      <app-refresh-button-component (buttonClicked)="refresh()" [isLoading]="isLoading"></app-refresh-button-component>
     </div>
+  </div>
+  @if (createOpen) {
+    <div class="mb-6 p-6 rounded-2xl border border-gray-200 bg-white flex flex-col gap-4">
+      <h2 class="text-sm font-semibold text-gray-700">Create new Token</h2>
+      <div class="flex flex-col gap-1">
+        <label for="name" class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Name</label>
+        <input
+          id="name"
+          type="text"
+          [(ngModel)]="createName"
+          placeholder="my-token"
+          class="px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 outline-none focus:bg-white transition"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Scope</label>
+        <div class="flex items-center gap-6">
+          <label for="allEndpoints" class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+            <input id="allEndpoints" type="radio" [(ngModel)]="createScopeAll" [value]="true" class="accent-orange-400" />
+            All Endpoints (<span class="font-mono text-xs">*</span>)
+          </label>
+          <label for="customEndpoints" class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+            <input id="customEndpoints" type="radio" [(ngModel)]="createScopeAll" [value]="false" class="accent-orange-400" />
+            Custom Endpoints
+          </label>
+        </div>
+        @if (!createScopeAll) {
+          <input
+            type="text"
+            [(ngModel)]="createScopeCustom"
+            placeholder="GetClusterStatus, ListBuckets, …"
+            class="px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 outline-none focus:bg-white transition font-mono"
+          />
+          <p class="text-xs text-gray-400">List all Endpoints</p>
+        }
+      </div>
+      @if (createError) {
+        <div class="bg-red-50 text-red-600 text-xs rounded-lg px-3.5 py-2.5 border border-red-100">
+          {{ createError }}
+        </div>
+      }
+      <div class="flex gap-3">
+        <button
+          (click)="submitCreate()"
+          [disabled]="isCreating"
+          class="px-4 py-2 text-sm font-semibold text-white bg-orange-400 hover:bg-orange-500 rounded-xl transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ isCreating ? 'Creating…' : 'Create' }}
+        </button>
+        <button
+          (click)="toggleCreatePanel()"
+          [disabled]="isCreating"
+          class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer disabled:opacity-50">
+          Abort
+        </button>
+      </div>
+    </div>
+  }
+  @if (deleteId) {
+    <div class="mb-6 p-6 rounded-2xl border border-red-200 bg-red-50 flex flex-col gap-4">
+      <div class="flex items-center gap-3">
+        <i class="ph ph-warning text-red-500 text-lg"></i>
+        <div>
+          <p class="text-sm font-semibold text-red-700">Delete Token?</p>
+          <p class="text-xs text-red-400 font-mono mt-0.5">{{ deleteId }}</p>
+          <p class="text-xs text-red-400 mt-1">All Token Rights will be removed.</p>
+        </div>
+      </div>
+      @if (deleteError) {
+        <div class="bg-white text-red-600 text-xs rounded-lg px-3.5 py-2.5 border border-red-200">
+          {{ deleteError }}
+        </div>
+      }
+      <div class="flex gap-3">
+        <button
+          (click)="submitDelete()"
+          [disabled]="isDeleting"
+          class="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ isDeleting ? 'Deleting…' : 'Delete' }}
+        </button>
+        <button
+          (click)="cancelDelete()"
+          [disabled]="isDeleting"
+          class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white hover:bg-gray-100 rounded-xl transition cursor-pointer disabled:opacity-50">
+          Abort
+        </button>
+      </div>
+    </div>
+  }
+  @if (adminTokens$ | async; as tokens) {
+    @if (tokens.length === 0) {
+      <div class="flex flex-col items-center justify-center gap-3 py-16 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
+        <i class="ph ph-key text-4xl text-gray-300"></i>
+        <p class="text-sm text-gray-400">No Tokens. This is impossible xD</p>
+      </div>
+    } @else {
+      <div class="flex flex-col gap-3">
+        @for (token of tokens; track token.id) {
+          <div class="flex flex-col gap-3">
+            @if (token.id != null) {
+              <app-token-card-component [token]="token" [deleteButton]="true" (deleteButtonClicked)="confirmDelete(token.id)"></app-token-card-component>
+            } @else {
+              <app-token-card-component [token]="token"></app-token-card-component>
+            }
+          </div>
+        }
+      </div>
+    }
   }
 </div>

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GetAdminTokenInfoResponse } from '../../generated/';
 
 @Component({
@@ -8,5 +8,11 @@ import { GetAdminTokenInfoResponse } from '../../generated/';
   styleUrl: './token-card-component.css',
 })
 export class TokenCardComponent {
-    @Input() token!: GetAdminTokenInfoResponse ;
+  @Input() token!: GetAdminTokenInfoResponse;
+  @Input() deleteButton: boolean = false;
+  @Output() deleteButtonClicked = new EventEmitter<void>();
+
+  delete() {
+    this.deleteButtonClicked.emit();
+  }
 }
