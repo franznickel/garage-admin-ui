@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { LogoComponent } from '../../components/logo-component/logo-component';
 import { AuthService } from '../../services/auth.service';
 import { AdminApiTokenApiService } from '../../generated/services/admin-api-token-api.service';
 import { inject } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login-page',
@@ -18,11 +19,13 @@ export class LoginPage implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
   private adminTokenApi = inject(AdminApiTokenApiService);
+  private cdr = inject(ChangeDetectorRef);
 
   loginForm!: FormGroup;
   isLoading = false;
   showPassword = false;
   errorMessage = '';
+  version = environment.version;
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -51,12 +54,17 @@ export class LoginPage implements OnInit {
       error: (e) => {
         this.authService.logout();
         this.errorMessage = e?.status === 401
-          ? 'Ungültiger Token.'
+          ? 'Invalid token.'
           : e?.status === 0
-            ? 'API nicht erreichbar. URL prüfen.'
-            : 'Verbindung fehlgeschlagen.';
+            ? 'API not reachable. Check URL.'
+            : 'Connection failed.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 }

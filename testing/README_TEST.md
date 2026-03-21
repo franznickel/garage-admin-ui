@@ -1,4 +1,5 @@
 `docker compose -f docker-compose.garage.yml --env-file .env.garage up --build --force-recreate`
+`docker compose -f docker-compose.local.yml up --build --force-recreate`
 
 http://localhost:3903
 3F6096F5F2EFAE09B5C1D6F81FBAAD51

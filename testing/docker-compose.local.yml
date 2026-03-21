@@ -1,0 +1,6 @@
+services:
+  garageadminui:
+    build:
+      context: ../.
+    ports:
+      - 4004:4004

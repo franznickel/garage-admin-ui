@@ -1,0 +1,28 @@
+services:
+  garageadminui:
+    image: 'ghcr.io/franznickel/garageadminui:0.0.1'
+    container_name: garageadminui
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.garageadminui.loadbalancer.server.port=4004"
+
+      # Routing
+      - "traefik.http.routers.garageadminui.rule=Host(`garageui.devbyfranz.de`)"
+      - "traefik.http.routers.garageadminui.entrypoints=websecure"
+      - "traefik.http.routers.garageadminui.tls.certresolver=letsencrypt"
+
+      # Security Headers
+      - "traefik.http.routers.garageadminui.middlewares=secure-headers"
+      - "traefik.http.middlewares.secure-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.secure-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.secure-headers.headers.stsPreload=true"
+      - "traefik.http.middlewares.secure-headers.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.secure-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserXssFilter=true"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    driver: bridge
